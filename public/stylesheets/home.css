@@ -12,7 +12,7 @@ body {
 }
 
 .cover-container {
-  max-width: 60vw;
+  max-width: 80vw;
 }
 
 .nav-link {
@@ -39,4 +39,14 @@ body {
   color: var(--white);
   background-color: transparent;
   border-color: var(--white);
+}
+
+@media (max-width: 700px) {
+  .nav {
+    display: none;
+  }
+
+  header h3 {
+    margin: 0 auto;
+  }
 }
