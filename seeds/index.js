@@ -39,15 +39,13 @@ const seedDB = async () => {
           cities[random1000].latitude,
         ],
       },
-      author: "61e8759419bbf6f377605cc3",
+      author: "USER_ID", // SHOULD MATCH WITH A USER ID ALREADY CREATED
       images: [
         {
-          url: "https://res.cloudinary.com/rafadatabase/image/upload/v1643034800/YelpCamp/camptesting_uegwyg.jpg",
-          filename: "YelpCamp/camptesting_uegwyg",
-        },
-        {
-          url: "https://res.cloudinary.com/rafadatabase/image/upload/v1643034808/YelpCamp/camptesting2_l69pw2.jpg",
-          filename: "YelpCamp/camptesting2_l69pw2",
+          // SHOULD BE A URL OF A IMAGE ALREADY IN YOUR CLOUDINARY DATABASE
+          url: "IMAGE_URL",
+          // SHOULD BE THE FILENAME OF A IMAGE ALREADY IN YOUR CLOUDINARY DATABASE
+          filename: "FILENAME",
         },
       ],
     });
