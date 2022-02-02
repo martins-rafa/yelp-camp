@@ -23,7 +23,10 @@ const userRoutes = require("./routes/users");
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
+const MongoStore = require("connect-mongo");
+
+const dbURL = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
+mongoose.connect(dbURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -45,9 +48,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
+const secret = process.env.SECRET || "thisshouldbeabettersecret!";
+
+const store = new MongoStore({
+  mongoUrl: dbURL,
+  touchAfter: 24 * 60 * 60,
+  crypto: {
+    secret,
+  },
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
 const sessionConfig = {
+  store,
   name: "session",
-  secret: "thisshouldbeabettersecret!",
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -68,7 +86,7 @@ const scriptSrcUrls = [
   "https://kit.fontawesome.com/",
   "https://cdnjs.cloudflare.com/",
   "https://cdn.jsdelivr.net/",
-  "https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/",
+  "https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/",
 ];
 const styleSrcUrls = [
   "https://kit-free.fontawesome.com/",
@@ -78,15 +96,15 @@ const styleSrcUrls = [
   "https://fonts.googleapis.com/",
   "https://use.fontawesome.com/",
   "https://cdn.jsdelivr.net/",
-  "https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/",
+  "https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/",
 ];
 const connectSrcUrls = [
   "https://*.tiles.mapbox.com",
   "https://api.mapbox.com",
   "https://events.mapbox.com",
-  "https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/",
+  "https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/",
 ];
-const fontSrcUrls = ["https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/"];
+const fontSrcUrls = ["https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/"];
 
 app.use(
   helmet({
@@ -102,11 +120,11 @@ app.use(
           "'self'",
           "blob:",
           "data:",
-          "https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT!
+          "https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT!
           "https://images.unsplash.com/",
         ],
         fontSrc: ["'self'", ...fontSrcUrls],
-        mediaSrc: ["https://res.cloudinary.com/YOUR_CLAUDINARY_CLOUD_NAME/"],
+        mediaSrc: ["https://res.cloudinary.com/YOUR_CLOUDINARY_NAME/"],
         childSrc: ["blob:"],
       },
     },
@@ -149,6 +167,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen("3000", () => {
-  console.log(`SERVER IS RUNNING ON http://localhost:3000/`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`SERVER IS RUNNING ON http://localhost:${PORT}/`);
 });
